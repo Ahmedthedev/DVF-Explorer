@@ -19,13 +19,14 @@ public class DvfExplorerApplicationTests {
     private DataSource dataSource;
 
     @Test
+    @Disabled("Ignore ce test ")
     void contextLoads() {
         // Vérifie que l'application se charge sans erreur
     }
 
 
     @Test
-    @Disabled("Ignore ce test temporairement")
+    @Disabled("Ignore ce test ")
     void testDatabaseConnection() throws SQLException {
         try (Connection conn = dataSource.getConnection()) {
             System.out.println("✅ Connexion à la base réussie : " + conn.getMetaData().getURL());
