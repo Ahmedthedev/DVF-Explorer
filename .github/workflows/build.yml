@@ -31,7 +31,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up environment variables
+      - name: Définir les variables d'environnement
         run: |
           echo "DB_HOST=localhost" >> $GITHUB_ENV
           echo "DB_PORT=5432" >> $GITHUB_ENV
@@ -39,5 +39,12 @@ jobs:
           echo "DB_USER=test_user" >> $GITHUB_ENV
           echo "DB_PASS=test_password" >> $GITHUB_ENV
 
-      - name: Build and run tests
+      - name: Attendre que PostgreSQL soit prêt
+        run: sleep 10
+
+      - name: Vérifier la connexion PostgreSQL
+        run: |
+          PGPASSWORD=$DB_PASS psql -h localhost -U $DB_USER -d $DB_NAME -c "SELECT 'PostgreSQL connecté!'"
+
+      - name: Build et tests
         run: mvn clean verify
