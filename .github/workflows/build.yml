@@ -38,9 +38,16 @@ jobs:
           echo "DB_NAME=test_db" >> $GITHUB_ENV
           echo "DB_USER=test_user" >> $GITHUB_ENV
           echo "DB_PASS=test_password" >> $GITHUB_ENV
+          echo "SPRING_MAIN_LOG-LEVEL=DEBUG" >> $GITHUB_ENV
 
       - name: Attendre que PostgreSQL soit prêt
-        run: sleep 10
+        run: |
+          for i in {1..30}; do
+            nc -z localhost 5432 && echo "PostgreSQL est prêt" && exit 0
+            echo "En attente de PostgreSQL..."
+            sleep 2
+          done
+          echo "Échec : PostgreSQL n'est pas accessible" && exit 1
 
       - name: Vérifier la connexion PostgreSQL
         run: |
