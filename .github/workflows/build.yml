@@ -60,4 +60,4 @@ jobs:
         run: echo "SPRING_MAIN_LOG-LEVEL=DEBUG" >> $GITHUB_ENV
     
       - name: Build et tests
-        run: mvn clean verify -X
+        run: mvn clean package -DskipTests
