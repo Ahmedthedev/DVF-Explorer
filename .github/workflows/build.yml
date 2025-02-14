@@ -55,6 +55,9 @@ jobs:
 
       - name: Afficher `application-test.yml`
         run: cat src/test/resources/application-test.yml
+
+      - name: Activer les logs détaillés
+        run: echo "SPRING_MAIN_LOG-LEVEL=DEBUG" >> $GITHUB_ENV
     
       - name: Build et tests
         run: mvn clean verify -X
