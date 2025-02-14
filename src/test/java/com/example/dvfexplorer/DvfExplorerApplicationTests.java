@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.yml")
+@TestPropertySource(locations = "classpath:test/resources/application-test.yml")
 public class DvfExplorerApplicationTests {
 
     @Autowired
