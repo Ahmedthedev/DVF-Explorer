@@ -1,61 +1,32 @@
-name: CI/CD Pipeline
+name: CI/CD Spring Boot
 
 on:
   push:
     branches:
-      - main  
+      - main
   pull_request:
     branches:
       - main
 
 jobs:
-  build-and-test:
-    name: Build & Test Spring Boot App
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Checkout du code
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Configuration de Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: maven
 
-      - name: Build & Run Tests
-        run: mvn clean package -DskipTests=false 
+      - name: Compilation et tests
+        run: mvn clean package
 
-      - name: Upload Artifact
+      - name: Upload du JAR
         uses: actions/upload-artifact@v3
         with:
           name: spring-boot-app
           path: target/*.jar
-
-  deploy:
-    name: Deploy to Server
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'  # Exécute seulement sur la branche principale
-
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: spring-boot-app
-          path: target/
-
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            pkill -f 'java -jar' || true
-            cd /home/${{ secrets.SSH_USER }}/app
-            rm -f app.jar
-            mv ~/target/*.jar app.jar
-            nohup java -jar app.jar > log.txt 2>&1 &
-
