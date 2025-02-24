@@ -17,6 +17,7 @@ public class BienImmobilierService {
 
     private final BienImmobilierRepository repository;
 
+    
     public BienImmobilierService(BienImmobilierRepository repository) {
         this.repository = repository;
     }

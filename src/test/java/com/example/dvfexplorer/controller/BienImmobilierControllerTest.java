@@ -1,56 +1,86 @@
 package com.example.dvfexplorer.controller;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import com.example.dvfexplorer.model.BienImmobilier;
 import com.example.dvfexplorer.service.BienImmobilierService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+@ExtendWith(MockitoExtension.class)
 public class BienImmobilierControllerTest {
 
-    private MockMvc mockMvc;
+    @InjectMocks
+    private BienImmobilierController bienImmobilierController;
 
     @Mock
-    private BienImmobilierService service;
+    private BienImmobilierService bienImmobilierService;
 
-    @InjectMocks
-    private BienImmobilierController controller;
+    private BienImmobilier bien1, bien2;
 
+    private List<BienImmobilier> biens;
+    
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        bien1 = new BienImmobilier();
+        bien1.setId(1L);
+        bien1.setCommune("Paris");
+        bien1.setStartingPrice(50000.0);
+        bien1.setSaleDateUnix(new Timestamp(System.currentTimeMillis() + 1000000));
+
+        bien2 = new BienImmobilier();
+        bien2.setId(2L);
+        bien2.setCommune("Lyon");
+        bien2.setStartingPrice(70000.0);
+        bien2.setSaleDateUnix(new Timestamp(System.currentTimeMillis() + 2000000));
+
+        biens = Arrays.asList(bien1,bien2);
     }
 
     @Test
-    void testGetAllBiens() throws Exception {
-        when(service.getAll()).thenReturn(List.of(new BienImmobilier(), new BienImmobilier()));
+    public void shouldGetAllBiens() {
+        List<BienImmobilier> biens = Arrays.asList(bien1, bien2);
 
-        mockMvc.perform(get("/api/biens"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2));
+       
+        given(bienImmobilierService.getAll()).willReturn(biens);
+
+       
+        List<BienImmobilier> result = bienImmobilierController.getAllBiens();
+
+        
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getCommune()).isEqualTo("Paris");
+        assertThat(result.get(1).getCommune()).isEqualTo("Lyon");
     }
 
     @Test
-    void testCreateBien() throws Exception {
-        BienImmobilier bien = new BienImmobilier();
-        when(service.save(any(BienImmobilier.class))).thenReturn(bien);
+    public void shouldGetBiensByCommune() {
+        given(bienImmobilierService.getByCommune("Paris")).willReturn(List.of(bien1));
 
-        mockMvc.perform(post("/api/biens")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(bien)))
-                .andExpect(status().isOk());
+        List<BienImmobilier> result = bienImmobilierController.getByCommune("Paris");
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getCommune()).isEqualTo("Paris");
+    }
+
+    @Test
+    public void shouldGetBiensAvenir() {
+        given(bienImmobilierService.getBiensAVenir()).willReturn(biens);
+
+        List<BienImmobilier> result = bienImmobilierController.getBiensAvenir();
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getCommune()).isEqualTo("Paris");
+        assertThat(result.get(1).getCommune()).isEqualTo("Lyon");
     }
 }

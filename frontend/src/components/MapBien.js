@@ -24,24 +24,22 @@ const MapBiens = () => {
     const fetchBiens = async (filters = {}) => {
         const hasFilters = Object.values(filters).some((val) => val !== undefined && val !== "");
         
-        // Sélectionner la bonne URL en fonction de l'état des filtres
         let urlBase = hasFilters
             ? `http://localhost:8080/api/biens/avenirFilter?`
             : `http://localhost:8080/api/biens/avenir`;
         
-        // Si aucun filtre, on fait une seule requête simple sans pagination
+        
         if (!hasFilters) {
             try {
             const response = await axios.get(urlBase);
             setBiens(response.data);
-            return; // On quitte la fonction ici
+            return; 
             } catch (error) {
             console.error("Erreur lors de la récupération des biens", error);
             return;
             }
         }
         
-        // Sinon, on boucle pour récupérer toutes les pages avec les filtres
         let allBiens = [];
         let page = 0;
         let totalPages = 1;
